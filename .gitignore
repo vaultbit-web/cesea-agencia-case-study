@@ -1,0 +1,23 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.swp
+
+# Node (not used here, but guard against accidents)
+node_modules/
+npm-debug.log*
+
+# Secrets — never commit
+.env
+.env.*
+*.pem
+*.key
+
+# Local capture scratch (raw, unoptimised screenshots + helper scripts)
+_raw/
+_raw2/
+_shot*.cjs
+_opt.cjs
