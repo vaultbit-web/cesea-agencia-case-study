@@ -24,7 +24,7 @@ The brand voice is Spanish and unapologetically editorial, so the engineering ha
     <td width="50%"><img src="assets/05-sector-salud-dental.webp" alt="Dental sector landing"><br><sub><b>Sector landing.</b> Dark editorial hero with the flip-cards that frame each vertical as <i>reto / abordaje</i>.</sub></td>
   </tr>
   <tr>
-    <td width="50%"><img src="assets/06-casos-grid.webp" alt="Case index grid"><br><sub><b>Case index.</b> Poster grid, one tile per vertical, art-directed rather than templated.</sub></td>
+    <td width="50%"><img src="assets/06-casos-grid.webp" alt="Case index grid"><br><sub><b>Case index.</b> Poster grid, one tile per vertical, each art-directed for its sector.</sub></td>
     <td width="50%"><img src="assets/07-caso-detalle.webp" alt="Case study detail"><br><sub><b>Case study.</b> A reusable template: challenge, approach timeline, process visual, results.</sub></td>
   </tr>
   <tr>
@@ -56,7 +56,7 @@ The brand voice is Spanish and unapologetically editorial, so the engineering ha
 
 **Motion.** The hero is a scroll-scrubbed frame sequence pinned across several viewport heights; scroll position drives playback, with a video fallback. Below it, a velocity-tied marquee, full-bleed scroll chapters, word-by-word reveals and the flip-cards all hang off Lenis and Framer Motion. Two rules kept it honest: no animation may cause layout shift, and everything checks `prefers-reduced-motion` and switches off cleanly.
 
-**Design system.** Three typefaces, a fixed palette, and spacing/colour tokens declared once in a Tailwind v4 `@theme` block. Sections compose from the same primitives, which is why a new sector landing or case study looks designed rather than assembled.
+**Design system.** Three typefaces, a fixed palette, and spacing/colour tokens declared once in a Tailwind v4 `@theme` block. Sections compose from the same primitives, which is why new sector landings and case studies stay visually consistent with no extra design work.
 
 **SEO & structured data.** This is a marketing agency, so the site has to practise what it sells. It emits a full JSON-LD graph — `Organization` (with each office modelled as a `LocalBusiness`, geo and opening hours), `WebSite` with a `SearchAction`, `Service` catalogues, `FAQPage`, `HowTo`, `BreadcrumbList`, `Article` and `Review` — cross-linked by stable `@id`s. Sitemap and robots are generated in code; metadata, canonicals and Open Graph are set per route. Images are served as AVIF/WebP through `next/image`.
 
@@ -70,12 +70,13 @@ The forms are the one place a stranger can reach the backend, so they're built d
 - **Secrets stay server-side.** SMTP, Supabase and Notion credentials live only in environment variables. The Supabase service-role key never leaves the server. Nothing sensitive is shipped to the client bundle.
 - **Fails soft.** Notification email, confirmation email and datastore writes run under `Promise.allSettled`; if one degrades, the visitor still gets a success response and the lead is never dropped.
 
-## Hardening backlog
+## Security assessment
 
-Written down because a security review that only lists what's already done isn't a review:
+Beyond the lead-capture hardening above, I ran a full security review of this site — reconnaissance, findings, remediation and verification — and used it to add a complete HTTP security-header baseline (a strict `self`-only CSP, HSTS, `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` and COOP), an access gate on the internal proposal decks, and a handful of smaller fixes. Every finding was remediated and verified in production.
 
-- Security response headers at the edge — CSP, HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`. The app-layer input/output hardening above is in place; the header layer is the next pass.
-- Move rate-limit state to a shared store (Redis) so the limits hold across more than one instance.
+**Full write-up: [SECURITY-ASSESSMENT.md](SECURITY-ASSESSMENT.md).**
+
+Still on the backlog: shared-store rate limiting (Redis) for multi-instance, and a hash- or nonce-based `script-src` to drop `'unsafe-inline'` once the framework's inline-script hashes stabilise or the site moves to per-request rendering.
 
 ## Performance & accessibility
 
